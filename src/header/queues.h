@@ -23,6 +23,38 @@ struct CircularQueue{
 };
 
 
+struct QueueNode{
+    
+    int INFO;
+    struct QueueNode*NEXT;
+
+
+};
+
+
+struct QueueLinkedList{
+
+   struct QueueNode*FRONT;
+   struct QueueNode*REAR;
+};
+            // linked list queue
+            
+struct QueueNode* createQueueNode(int);
+
+struct QueueLinkedList* create_queue_linked_list();
+
+int isEmptyLinkedListQueue(struct QueueLinkedList*);
+
+int isFullLinkedListQueue(struct QueueLinkedList*);
+
+int enqueLinkedList(struct QueueLinkedList*,int);
+
+int dequeLinkedList(struct QueueLinkedList*);
+        
+void log_queue_linked_list(struct QueueLinkedList*);
+
+int queue_size_linked_list(struct QueueLinkedList*);
+
     
             //circular queue
 
@@ -38,6 +70,8 @@ int isCircularQueueFull(struct CircularQueue* );
 int isCircularQueueEmpty(struct CircularQueue*);
 
 void print_circular_queue(struct CircularQueue*);
+
+void log_circular_queue(struct CircularQueue*);
 
 int resize(struct CircularQueue*);
 

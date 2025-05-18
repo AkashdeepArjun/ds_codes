@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
     enque_circular_queue(queue,7 );
     enque_circular_queue(queue,8 );
     
-    print_circular_queue(queue);
+    log_circular_queue(queue);
 
     for (int count =1; count<=2; count++) {
     int item = deque_circular_queue(queue);
@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
     
     }
 
-    print_circular_queue(queue);
+    log_circular_queue(queue);
 
     for (int count =1; count<=2; count++) {
         enque_circular_queue(queue, num);
@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
 
     }
 
-    print_circular_queue(queue);
+    log_circular_queue(queue);
 
     printf("\n LETS TRY TO ADD 11 \n");
 

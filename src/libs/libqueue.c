@@ -1,5 +1,6 @@
 #include "../header/utils.h"
 // #include <iterator>
+// #include <cstddef>
 #include<malloc.h>
 #include "../header/queues.h"
 #include <assert.h>
@@ -250,6 +251,56 @@ int start=q->FRONT<=q->REAR?q->FRONT:q->REAR;
 }
 
 
+void log_circular_queue(struct CircularQueue*q){
+
+    if(q->FRONT>q->REAR){
+            
+        int start=q->FRONT;
+
+        while(start>=q->REAR)
+        {
+                
+            if(start==q->REAR){
+                printf("\n%d",q->ELEMENTS[start]);
+            }
+            else{
+                printf("%d->",q->ELEMENTS[start]);
+            }
+
+            start--;
+
+        }
+
+
+
+
+    }else{
+
+        int start=q->FRONT;
+
+        while(start<=q->REAR)
+        {
+                
+            if(start==q->REAR){
+                printf("\n%d",q->ELEMENTS[start]);
+            }
+            else{
+                printf("%d->",q->ELEMENTS[start]);
+            }
+
+            start++;
+
+
+
+        }
+
+    }
+
+}
+
+
+
+
 int resize(struct CircularQueue*q){
 
     int offset_size=q->CAPACITY;
@@ -273,6 +324,118 @@ int resize(struct CircularQueue*q){
     }
 
     return  1;
+}
+
+// linkedlist queue 
+ struct QueueNode* createQueueNode(int item){
+
+     struct QueueNode*queue_node = (struct QueueNode*)malloc(sizeof(struct QueueNode*));
+    assert(queue_node!=NULL);
+    queue_node->INFO=item;
+    queue_node->NEXT=NULL;
+    return queue_node;
+ }
+
+struct QueueLinkedList* create_queue_linked_list(){
+
+    
+     struct QueueLinkedList*queue = (struct QueueLinkedList*)malloc(sizeof(struct QueueLinkedList*));
+    assert(queue!=NULL);
+    queue->FRONT=NULL;
+    queue->REAR=NULL;
+    return queue; 
+
+
+
+
+}
+
+ int isEmptyLinkedListQueue(struct QueueLinkedList * queue){
+
+    
+     return (queue->FRONT==NULL && queue->REAR==NULL);
+
+
+ }
+
+int queue_size_linked_list(struct QueueLinkedList *queue){
+   int SIZE=0;
+   struct QueueNode* begin=queue->FRONT;
+   
+   while (begin!=NULL) {
+    
+       SIZE++;
+       begin =begin->NEXT;
+
+   }
+
+   return SIZE;
+
+
+}
+
+int enqueLinkedList(struct QueueLinkedList *queue,int item){
+    printf("\nENQUEING %d",item);
+    struct QueueNode*queue_node=createQueueNode(item);
+    if(queue->REAR==NULL){
+       
+        queue->REAR=queue_node;
+    }else{
+        queue->REAR->NEXT=queue_node;
+        queue->REAR=queue_node;
+    }
+
+    if (queue->FRONT==NULL) {
+    
+        queue->FRONT=queue->REAR;
+    }
+
+    return 1;
+
+}
+
+int dequeLinkedList(struct QueueLinkedList *q){
+
+    if (!queue_size_linked_list(q)) {
+        
+        printf("\nQUEUE IS EMPTY");
+        
+        return 0;
+    }else {
+            
+        int d= q->FRONT->INFO;
+        if(q->FRONT==q->REAR){
+            q->REAR=NULL;
+            q->FRONT=NULL;
+           }else{
+
+        q->FRONT=q->FRONT->NEXT;
+           }
+        
+        return d;
+    }
+
+
+} 
+
+void log_queue_linked_list(struct QueueLinkedList *q){
+
+    struct QueueNode*start=q->FRONT;
+    printf("QUEUE \n");
+    while(start!=NULL){
+            
+        if(start->NEXT==NULL){
+            printf("\%d",start->INFO);
+        }else{
+            printf("%d->",start->INFO);
+        }
+
+        start=start->NEXT;
+
+    }
+
+    printf("\n");
+
 
 
 
