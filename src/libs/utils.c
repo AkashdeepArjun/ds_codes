@@ -14,15 +14,14 @@
 void rand_init(){
 
     time_t t;
-    srand((unsigned)time(&t));
+    srand((unsigned)time(NULL));
 
 }
 
 
 int gen_random_size(int min,int max){
 
-    int random_num =(rand()%(max-min)+1)+min;
-   /*srand(time(NULL)); */
+    int random_num =(rand()%((max-min)+1))+min;
     return random_num;
 
 }
@@ -40,6 +39,7 @@ return benchmark;
 
 
 }
+
 
 void take_log(char*message){
 

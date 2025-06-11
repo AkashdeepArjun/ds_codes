@@ -1,82 +1,67 @@
-#include "../header/algos_sort.h"
+#include "../header/array.h"
 #include "../header/utils.h"
-void merge(int*,int*,int,int,int,struct AlgoBenchMark*);
-void  merge_sort(int*ARRAY,int*RESULT,int LEFT_CURSOR,int RIGHT_CURSOR,struct AlgoBenchMark*benchmark){
+#include "../header/sorting.h"
 
-    int MIDDLE_INDEX;
-    if(RIGHT_CURSOR>LEFT_CURSOR){
-            
-        MIDDLE_INDEX=(LEFT_CURSOR+RIGHT_CURSOR)/2;
-        merge_sort(ARRAY,RESULT,LEFT_CURSOR,MIDDLE_INDEX,benchmark);
-        merge_sort(ARRAY,RESULT,MIDDLE_INDEX+1,RIGHT_CURSOR,benchmark);
-        merge(ARRAY,RESULT,LEFT_CURSOR,MIDDLE_INDEX+1,RIGHT_CURSOR,benchmark);
+void merge_sort(int*data, int *result, int start, int end, struct AlgoBenchMark *benchmark){
 
 
-
+    if(start<end){
+        int mid =(start+end)/2;
+        merge_sort(data,result,start,mid,benchmark);
+        merge_sort(data,result,mid+1,end,benchmark);
+        merge(data, result, start, mid+1, end, benchmark);
     }
-    
-    
 
 
 
 
 }
-void merge(int*ARRAY,int*RESULT,int LEFT_CURSOR,int MIDDLE_INDEX,int RIGHT_CURSOR,struct AlgoBenchMark*benchmark){
 
-    int LEFT_END=MIDDLE_INDEX-1;
-    int CURSOR_RESULT=LEFT_CURSOR;
-    int SIZE=RIGHT_CURSOR-LEFT_CURSOR+1;
-    int LEFT_PTR=LEFT_CURSOR;
-    int RIGHT_PTR=RIGHT_CURSOR;
-    int MIDDLE_PTR=MIDDLE_INDEX;
-    /*int *counter =COUNTER;*/
-
-    while (LEFT_PTR<=LEFT_END && MIDDLE_PTR<=RIGHT_CURSOR) {
-
-        if (ARRAY[LEFT_PTR]<=ARRAY[MIDDLE_PTR]) {
-        
-            RESULT[CURSOR_RESULT]=ARRAY[LEFT_PTR];
-            benchmark->COMPARISONS++;
-
-             CURSOR_RESULT++;
-            /**counter=*counter+1;*/
-            LEFT_PTR++;
-        
-
-        }else {
-        benchmark->COMPARISONS++;
-                
-            RESULT[CURSOR_RESULT]=ARRAY[MIDDLE_PTR];
-
-            CURSOR_RESULT++;
-            /**counter+=1;*/
-            MIDDLE_PTR++;
+void merge(int* data ,int *result, int start, int middle, int end, struct AlgoBenchMark * benchmark){
+    int l=start;
+    int r= end;
+    int m=middle;
+    int left_end=middle-1;
+    int right_end =end;
+    int size=end-start+1;
+    int pos=start;
+    while((l<=left_end) && (m<=right_end)){
+       
+        benchmark->COMPARISONS+=1;
+        if (data[l]<=data[m]) {
+            result[pos]=data[l];
+            pos++;
+            l++;
+        }else{
             
-
+            result[pos]=data[m];
+            pos++;
+            m++;
         }
-            
+
+
+
     }
 
-   while (LEFT_PTR<=LEFT_END) {
-   
-       RESULT[CURSOR_RESULT]=ARRAY[LEFT_PTR];
-       CURSOR_RESULT++;
-       LEFT_PTR++;
-   }
+    while(l<=left_end){
+        result[pos]=data[l];
+        pos++;
+        l++;
+    }
 
-   while (RIGHT_PTR<=RIGHT_CURSOR) {
-       RESULT[CURSOR_RESULT]=ARRAY[RIGHT_PTR];
-       CURSOR_RESULT++;
-       RIGHT_PTR++;
-   
-   }
-
-   for(int INDEX=LEFT_CURSOR;INDEX<LEFT_CURSOR+SIZE;INDEX++){
-
-       ARRAY[INDEX]=RESULT[INDEX];
-   }
+    while(m<=right_end){
+        
+        result[pos]=data[m];
+        pos++;
+        m++;
 
 
+
+    }
+
+    for (int index=start;index<=end;index++) {
+        data[index]=result[index];
+    }
 
 
 

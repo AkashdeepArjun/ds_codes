@@ -19,11 +19,11 @@ int* create_empty_array(int size){
 int* create_random_array(int size){
 
     int *arr_ref=(int*)malloc(size*sizeof(int));
-    rand_init();
+    // rand_init();
     for(int index=0;index<size;index++){
         
 
-        arr_ref[index]=rand()%101;
+        arr_ref[index]=gen_random_size(0, 10);
 
         //Logiic rand()%[max-min+1]+min
 

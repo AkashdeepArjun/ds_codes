@@ -1,99 +1,68 @@
-#!/usr/bin/bash
-# set -euo pipefail
+#!/usr/bin/env bash
 
-source './config.sh'
+source ./config.sh
 
-echo "compiling libraries"
-gcc -c $PROJECT_LIBS/*.c
+# Helper: Create temp file
+TMP_FILE=$(mktemp)
 
-if [[ $? -eq 0 ]]; then
-    echo " COMPILED LIBRARY SUCCESS MOVING  OBJECTS TO OBJECT FOLDER "
-    if [[ -d $PROJECT_OBJ ]]; then
-        mv ./*.o $PROJECT_OBJ/
-    else
-        mkdir $PROJECT_OBJ
-        mv *.o $PROJECT_OBJ
-    fi
-    echo "LIBRARY COMPILE SUCCESS"
-fi
-echo "MAKING SHARED OBJECT DIRECTORY..."
-if [[ ! -d $LIBS_OBJECT ]]; then
-    mkdir $LIBS_OBJECT
-    if [[ $? -eq 0 ]]; then
-        echo "SHARED LIB FOLDER CREATED"
-    fi
-else
-    echo "making lib file....."
-    ar rcs $LIBS_OBJECT/'libproject.a' $PROJECT_OBJ/*.o
+# Create folders if not exist
+mkdir -p "$PROJECT_OBJ" "$PROJECT_BIN" "$LIBS_OBJECT"
 
-    if [[ $? -eq 0 ]]; then
-        echo "SHARED LIB FILE CREATION SUCCESS"
-
-    fi
-
-fi
-
-# read -p "ente source file " src_file
-# echo "select source file "
-#
-# src_file=$(zenity --file-selection)
-#
-# if [[ -z $src_file ]]; then
-#     echo "please select source file again"
-#     exit
-#
-# fi
-
-# if [[ ! -d $PROJECT_SRC ]]; then
-#     mkdir -p $PROJECT_SRC
-#     echo "src folder created with status code {$?}"
-# fi
-#
-# if [[ ! -d $PROJECT_BIN ]]; then
-#     mkdir -p $PROJECT_BIN
-#     echo "bin folder created with status code {$?}"
-# fi
-
-file_proper=$PROJECT_SRC/"${src_file}.c"
-#
-# echo "you have specified $file_proper"
-# if [[ ! -e $file_proper ]]; then
-#     echo "you have not specified valid file"
-#     exit
-# fi
-# read -p "enter output file name" output_file
-#
-# if [[ -z $output_file ]]; then
-#     echo "please enter valid  output file name"
-#     exit
-#
-# fi
-#
-if [[ ! -d $PROJECT_SRC ]]; then
-    echo " no source file folder exist please add some source files for cpmpile"
-    exit -1
-fi
-
-echo "compiling source "
-
-src_files=($(ls ${PROJECT_SRC}))
-
-for file in ${src_files[@]}; do
-
-    output_file="${file%%.*}"
-    echo "file found ${output_file}"
-    gcc $PROJECT_SRC/$file -I $PROJECT_HEADERS -L $LIBS_OBJECT -l project -o $PROJECT_BIN/$output_file
-    if [[ $? -eq 0 ]]; then
-        echo "Build source file ${output_file} Success"
-    else
-        echo "build error please  try recompiling again "
-        exit -1
-    fi
-
+### 1. Select libraries to compile
+LIB_FILES=()
+for file in "$PROJECT_LIBS"/*.c; do
+    fname=$(basename "$file")
+    LIB_FILES+=("$fname" "" off)
 done
 
-# gcc $src_file -I $PROJECT_HEADERS -L $LIBS_OBJECT -l project -o $PROJECT_BIN/$output_file
+dialog --checklist "Select library files to compile:" 15 50 6 "${LIB_FILES[@]}" 2>"$TMP_FILE"
+selected_libs=$(<"$TMP_FILE")
+if [[ -z "$selected_libs" ]]; then
+    echo "No libraries selected. Exiting."
+    exit 1
+fi
+
+# Compile selected libraries
+for lib in $selected_libs; do
+    lib="${lib//\"/}" # remove quotes
+    echo "Compiling $lib"
+    gcc -c "$PROJECT_LIBS/$lib" -I "$PROJECT_HEADERS"
+    if [[ $? -ne 0 ]]; then
+        echo "Failed to compile $lib"
+        exit 1
+    fi
+done
+
+# Move .o files
+mv ./*.o "$PROJECT_OBJ/" 2>/dev/null
+
+# Create static library
+ar rcs "$LIBS_OBJECT/libproject.a" "$PROJECT_OBJ"/*.o
+
+### 2. Select main source file
+MAIN_FILES=()
+for file in "$PROJECT_SRC"/*.c; do
+    fname=$(basename "$file")
+    MAIN_FILES+=("$fname" "" off)
+done
+
+dialog --radiolist "Select main source file to compile:" 15 50 6 "${MAIN_FILES[@]}" 2>"$TMP_FILE"
+main_file=$(<"$TMP_FILE")
+if [[ -z "$main_file" ]]; then
+    echo "No main file selected. Exiting."
+    exit 1
+fi
+
+output_file="${main_file%%.*}" # e.g., main from main.c
+
+echo "Compiling main source: $main_file"
+gcc "$PROJECT_SRC/$main_file" -I "$PROJECT_HEADERS" -L "$LIBS_OBJECT" -l project -o "$PROJECT_BIN/$output_file"
 
 if [[ $? -eq 0 ]]; then
-    echo "BUILD PROJECT SUCCESS"
+    echo "Build successful. Output: $PROJECT_BIN/$output_file"
+else
+    echo "Build failed."
+    exit 1
 fi
+
+rm "$TMP_FILE"

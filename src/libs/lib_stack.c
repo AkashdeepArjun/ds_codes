@@ -22,6 +22,16 @@ return mystack;
 
 
 }
+int is_stack_empty(struct Stack*stack){
+
+    
+    return stack->top==-1;
+
+
+}
+
+
+
 
 int push(struct Stack * storage, int new_element){
     
